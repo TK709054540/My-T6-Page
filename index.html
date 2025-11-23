@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>玄机六爻 · 直通推演</title>
+    <title>玄机六爻 · Gemini 推演</title>
     <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.6.12/lunar.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         /* --- 全局古风雅韵主题 --- */
         :root {
-            --primary-ink: #2c3e50;    /* 玄墨深 */
-            --accent-gold: #c2995f;    /* 雅致鎏金 */
-            --highlight-red: #a52a2a;  /* 古典朱砂红 */
-            --bg-paper: #f8f7f5;       /* 宣纸白 */
-            --border-light: #e0e0e0;   /* 淡描边 */
+            --primary-ink: #2c3e50;
+            --accent-gold: #c2995f;
+            --highlight-red: #a52a2a;
+            --bg-paper: #f8f7f5;
+            --border-light: #e0e0e0;
             --card-soft: #ffffff;
-            --font-main: 'FangSong', 'KaiTi', 'SimSun', serif; /* 仿宋、楷体等古典字体 */
+            --font-main: 'FangSong', 'KaiTi', 'SimSun', serif;
         }
 
         body {
@@ -23,7 +23,7 @@
             background: var(--bg-paper);
             color: var(--primary-ink);
             margin: 0;
-            padding: 30px 15px; /* 上下左右工整留白 */
+            padding: 30px 15px;
             display: flex;
             justify-content: center;
             min-height: 100vh;
@@ -32,11 +32,11 @@
 
         .app-container {
             width: 100%;
-            max-width: 480px; /* 适中宽度 */
+            max-width: 480px;
             background: var(--card-soft);
             border-radius: 12px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-            padding: 25px; /* 内边距 */
+            padding: 25px;
             border: 1px solid var(--border-light);
             display: flex;
             flex-direction: column;
@@ -170,7 +170,7 @@
 <div class="app-container">
     <header>
         <h1>玄机<span>六爻</span></h1>
-        <div class="subtitle">洞察天机 · 直通推演</div>
+        <div class="subtitle">洞察天机 · Gemini 推演</div>
     </header>
 
     <div id="setupView">
@@ -196,12 +196,12 @@
             <div class="ai-content" id="aiOutput">
                 <div style="text-align:center; color:#999;">请点击下方按钮请求 AI 解读...</div>
                 <div style="text-align:center; margin-top:20px;">
-                    <button class="btn btn-ai" id="aiBtn" onclick="callDeepSeek()">🤖 请求 AI 大师解卦</button>
+                    <button class="btn btn-ai" id="aiBtn" onclick="callGeminiAI()">🤖 请求 AI 大师解卦</button>
                 </div>
             </div>
             
             <div class="share-prompt">
-                （Key已固化，无需重复输入）
+                （API Key已固化，请勿分享此文件）
             </div>
         </div>
         
@@ -212,9 +212,13 @@
 </div>
 
 <script>
-    // --- 核心配置 ---
-    const DEEPSEEK_API_KEY = "sk-bf016720c8db4f70a9b0b72f05060e48"; // 固化您的 Key
+    // --- Gemini API 配置 ---
+    const GEMINI_API_KEY = "AIzaSyDdg0Zrn99QcPshFZmt-hVXtLsUOGjJ2o4"; 
+    const GEMINI_MODEL = "gemini-2.5-flash";
+    const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
 
+
+    // --- 核心配置 ---
     const CFG = {
         NA_JIA: { '乾': {z:['子','寅','辰','午','申','戌']}, '坤': {z:['未','巳','卯','丑','亥','酉']}, '震': {z:['子','寅','辰','午','申','戌']}, '巽': {z:['丑','亥','酉','未','巳','卯']}, '坎': {z:['寅','辰','午','申','戌','子']}, '离': {z:['卯','丑','亥','酉','未','巳']}, '艮': {z:['辰','午','申','戌','子','寅']}, '兑': {z:['巳','卯','丑','亥','酉','未']} },
         PALACE: {'乾':'金','兑':'金','离':'火','震':'木','巽':'木','坎':'水','艮':'土','坤':'土'},
@@ -224,7 +228,7 @@
 
     let state = { count: 0, results: [], data: {} };
     
-    // --- 摇卦函数 ---
+    // --- 摇卦函数 (不变) ---
     function userToss() {
         try {
             if(state.count >= 6) return;
@@ -259,7 +263,7 @@
         }
     }
 
-    // --- 排盘函数 ---
+    // --- 排盘函数 (不变) ---
     function calculate() {
         document.getElementById('setupView').style.display = 'none';
         document.getElementById('resultView').style.display = 'block';
@@ -295,9 +299,9 @@
         `;
     }
 
-    // --- AI 解卦函数 (直接调用 DeepSeek API，使用硬编码 Key) ---
-    async function callDeepSeek() {
-        const apiKey = DEEPSEEK_API_KEY; // 使用固化的 Key
+    // --- AI 解卦函数 (已修复 JSON 结构) ---
+    async function callGeminiAI() {
+        const apiKey = GEMINI_API_KEY; 
         const btn = document.getElementById('aiBtn');
         const out = document.getElementById('aiOutput');
         
@@ -307,43 +311,43 @@
         }
 
         btn.disabled = true;
-        btn.innerText = "⏳ AI 正在推算，请稍候...";
+        btn.innerText = "⏳ Gemini 正在推算，请稍候...";
         out.innerHTML = `<div style='text-align:center; color:${getComputedStyle(document.documentElement).getPropertyValue('--accent-gold').trim()};'>神机推演中，请稍候...</div>`;
         
         const prompt = `你是专业的六爻大师。问题：${state.data.q}。时间：${state.data.d}。本卦：${state.data.g}。动爻：${state.data.m}。请严格按照以下步骤推算并格式化输出：\n\n### 1. 简要分析\n\n- 取用神\n- 析旺衰\n\n### 2. 吉凶断语\n\n- 直接给出结论（吉/凶/平）\n- 解释主卦与动爻对用神的影响。\n\n### 3. 行动建议\n\n- 提供通俗易懂、具有哲理性的行动指导和建议。`;
 
         try {
-            const res = await fetch('https://api.deepseek.com/chat/completions', {
+            const res = await fetch(GEMINI_ENDPOINT, {
                 method: 'POST',
                 headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`
+                    'Content-Type': 'application/json'
                 },
+                // 修正：将 config 替换为 generationConfig
                 body: JSON.stringify({
-                    model: "deepseek-chat",
-                    messages: [{role: "user", content: prompt}],
-                    temperature: 1.0,
-                    stream: false
+                    contents: [{role: "user", parts: [{text: prompt}]}],
+                    generationConfig: {temperature: 1.0} 
                 })
             });
             
             const data = await res.json();
             
-            if(res.status !== 200) {
-                 throw new Error(data.error?.message || `API请求失败，状态码: ${res.status}`);
+            if(res.status !== 200 || !data.candidates || data.candidates.length === 0) {
+                 throw new Error(data.error?.message || `Gemini API请求失败，状态码: ${res.status}`);
             }
             
-            out.innerHTML = typeof marked !== 'undefined' ? marked.parse(data.choices[0].message.content) : data.choices[0].message.content;
+            const resultText = data.candidates[0].content.parts[0].text;
+            
+            out.innerHTML = typeof marked !== 'undefined' ? marked.parse(resultText) : resultText;
             btn.style.display = 'none';
 
         } catch(e) {
-            out.innerHTML = `<div style="color:var(--highlight-red); font-weight:bold;">❌ 推算失败：${e.message}<br>请检查 Key 是否有效或网络是否畅通。</div>`;
+            out.innerHTML = `<div style="color:var(--highlight-red); font-weight:bold;">❌ 推算失败：${e.message}<br>请检查 Key 或网络是否畅通。</div>`;
             btn.innerText = "❌ 重新请求"; btn.disabled = false;
             console.error("AI解卦错误:", e);
         }
     }
 
-    // --- 辅助函数 (保持不变) ---
+    // --- 辅助函数 (不变) ---
     function getGuaName(bits) {
         const n = ['坤','震','坎','兑','艮','离','巽','乾'];
         const guaNames = ['天', '地', '水', '火', '雷', '风', '山', '泽'];
