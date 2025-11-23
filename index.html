@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>玄机六爻 · Gemini 推演</title>
+    <title>玄机六爻 · Gemini Worker 直通</title>
     <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.6.12/lunar.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         /* --- 全局古风雅韵主题 --- */
         :root {
-            --primary-ink: #2c3e50;
-            --accent-gold: #c2995f;
-            --highlight-red: #a52a2a;
-            --bg-paper: #f8f7f5;
-            --border-light: #e0e0e0;
+            --primary-ink: #2c3e50;    /* 玄墨深 */
+            --accent-gold: #c2995f;    /* 雅致鎏金 */
+            --highlight-red: #a52a2a;  /* 古典朱砂红 */
+            --bg-paper: #f8f7f5;       /* 宣纸白 */
+            --border-light: #e0e0e0;   /* 淡描边 */
             --card-soft: #ffffff;
             --font-main: 'FangSong', 'KaiTi', 'SimSun', serif;
         }
@@ -170,7 +170,7 @@
 <div class="app-container">
     <header>
         <h1>玄机<span>六爻</span></h1>
-        <div class="subtitle">洞察天机 · Gemini 推演</div>
+        <div class="subtitle">洞察天机 · Gemini Worker 直通</div>
     </header>
 
     <div id="setupView">
@@ -201,7 +201,7 @@
             </div>
             
             <div class="share-prompt">
-                （API Key已固化，请勿分享此文件）
+                （通过 Cloudflare Worker 代理访问 Gemini API）
             </div>
         </div>
         
@@ -212,13 +212,12 @@
 </div>
 
 <script>
-    // --- Gemini API 配置 ---
-    const GEMINI_API_KEY = "AIzaSyDdg0Zrn99QcPshFZmt-hVXtLsUOGjJ2o4"; 
-    const GEMINI_MODEL = "gemini-2.5-flash";
-    const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+    // --- Gemini API 配置 (已集成您的 Worker URL) ---
+    // ⚠️ 注意：API Key 已安全地存储在您的 Cloudflare Worker 环境变量中。
+    const GEMINI_ENDPOINT = "https://t6.tk709054540.workers.dev/"; 
 
 
-    // --- 核心配置 ---
+    // --- 核心配置 (不变) ---
     const CFG = {
         NA_JIA: { '乾': {z:['子','寅','辰','午','申','戌']}, '坤': {z:['未','巳','卯','丑','亥','酉']}, '震': {z:['子','寅','辰','午','申','戌']}, '巽': {z:['丑','亥','酉','未','巳','卯']}, '坎': {z:['寅','辰','午','申','戌','子']}, '离': {z:['卯','丑','亥','酉','未','巳']}, '艮': {z:['辰','午','申','戌','子','寅']}, '兑': {z:['巳','卯','丑','亥','酉','未']} },
         PALACE: {'乾':'金','兑':'金','离':'火','震':'木','巽':'木','坎':'水','艮':'土','坤':'土'},
@@ -299,30 +298,25 @@
         `;
     }
 
-    // --- AI 解卦函数 (已修复 JSON 结构) ---
+    // --- AI 解卦函数 (通过 Worker 代理访问) ---
     async function callGeminiAI() {
-        const apiKey = GEMINI_API_KEY; 
         const btn = document.getElementById('aiBtn');
         const out = document.getElementById('aiOutput');
         
-        if (!apiKey) {
-            out.innerHTML = `<div style="color:var(--highlight-red); font-weight:bold;">❌ 错误：代码中未找到 API Key。</div>`;
-            return;
-        }
-
         btn.disabled = true;
-        btn.innerText = "⏳ Gemini 正在推算，请稍候...";
+        btn.innerText = "⏳ AI 正在通过代理推算，请稍候...";
         out.innerHTML = `<div style='text-align:center; color:${getComputedStyle(document.documentElement).getPropertyValue('--accent-gold').trim()};'>神机推演中，请稍候...</div>`;
         
         const prompt = `你是专业的六爻大师。问题：${state.data.q}。时间：${state.data.d}。本卦：${state.data.g}。动爻：${state.data.m}。请严格按照以下步骤推算并格式化输出：\n\n### 1. 简要分析\n\n- 取用神\n- 析旺衰\n\n### 2. 吉凶断语\n\n- 直接给出结论（吉/凶/平）\n- 解释主卦与动爻对用神的影响。\n\n### 3. 行动建议\n\n- 提供通俗易懂、具有哲理性的行动指导和建议。`;
 
         try {
+            // 请求发送到 Worker Endpoint
             const res = await fetch(GEMINI_ENDPOINT, {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json'
                 },
-                // 修正：将 config 替换为 generationConfig
+                // Worker 会将 generationConfig 转发给 Gemini API
                 body: JSON.stringify({
                     contents: [{role: "user", parts: [{text: prompt}]}],
                     generationConfig: {temperature: 1.0} 
@@ -332,16 +326,18 @@
             const data = await res.json();
             
             if(res.status !== 200 || !data.candidates || data.candidates.length === 0) {
-                 throw new Error(data.error?.message || `Gemini API请求失败，状态码: ${res.status}`);
+                 // Worker 返回的错误或 Gemini API 的错误
+                 throw new Error(data.error?.message || `代理请求失败，状态码: ${res.status}`);
             }
             
+            // 解析 Gemini 响应
             const resultText = data.candidates[0].content.parts[0].text;
             
             out.innerHTML = typeof marked !== 'undefined' ? marked.parse(resultText) : resultText;
             btn.style.display = 'none';
 
         } catch(e) {
-            out.innerHTML = `<div style="color:var(--highlight-red); font-weight:bold;">❌ 推算失败：${e.message}<br>请检查 Key 或网络是否畅通。</div>`;
+            out.innerHTML = `<div style="color:var(--highlight-red); font-weight:bold;">❌ 推算失败：${e.message}<br>请检查 Worker URL 或代理服务是否正常。</div>`;
             btn.innerText = "❌ 重新请求"; btn.disabled = false;
             console.error("AI解卦错误:", e);
         }
