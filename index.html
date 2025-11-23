@@ -3,143 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>玄机六爻 · 深度推算</title>
+    <title>玄机六爻 · 直通推演</title>
     <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.6.12/lunar.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-        /* --- 全局精致主题：玄墨与鎏金 --- */
+        /* --- 全局古风雅韵主题 --- */
         :root {
-            --dark-primary: #1a2a3a; /* 玄墨蓝 */
-            --accent-gold: #d4af37; /* 鎏金 */
-            --action-red: #c0392b; /* 朱砂红 */
-            --bg-light: #f4f5f9; /* 浅灰底 */
-            --card-white: #ffffff;
-            --font-serif: 'PingFang SC', 'Songti SC', serif;
+            --primary-ink: #2c3e50;    /* 玄墨深 */
+            --accent-gold: #c2995f;    /* 雅致鎏金 */
+            --highlight-red: #a52a2a;  /* 古典朱砂红 */
+            --bg-paper: #f8f7f5;       /* 宣纸白 */
+            --border-light: #e0e0e0;   /* 淡描边 */
+            --card-soft: #ffffff;
+            --font-main: 'FangSong', 'KaiTi', 'SimSun', serif; /* 仿宋、楷体等古典字体 */
         }
 
         body {
-            font-family: var(--font-serif);
-            background: var(--bg-light);
-            color: var(--dark-primary);
+            font-family: var(--font-main);
+            background: var(--bg-paper);
+            color: var(--primary-ink);
             margin: 0;
-            padding: 0;
+            padding: 30px 15px; /* 上下左右工整留白 */
             display: flex;
             justify-content: center;
             min-height: 100vh;
-            padding-top: 30px;
+            box-sizing: border-box;
         }
 
         .app-container {
             width: 100%;
-            max-width: 420px; /* 适配手机宽度 */
-            background: var(--card-white);
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-            padding: 30px 20px;
-            margin-bottom: 30px;
-            box-sizing: border-box;
-            transition: all 0.3s ease;
+            max-width: 480px; /* 适中宽度 */
+            background: var(--card-soft);
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            padding: 25px; /* 内边距 */
+            border: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
         }
 
-        /* 标题设计 */
-        header { text-align: center; margin-bottom: 25px; }
-        h1 { 
-            margin: 0; 
-            font-size: 1.8rem; 
-            letter-spacing: 2px; 
-            color: var(--dark-primary); 
-            font-weight: bold;
-        }
+        /* 标题区 */
+        header { text-align: center; margin-bottom: 30px; border-bottom: 1px dashed var(--border-light); padding-bottom: 15px; }
+        h1 { margin: 0; font-size: 2rem; letter-spacing: 4px; color: var(--primary-ink); font-weight: bold; }
         h1 span { color: var(--accent-gold); }
-        .subtitle { font-size: 0.85rem; color: #888; margin-top: 5px; }
+        .subtitle { font-size: 0.9rem; color: #888; margin-top: 8px; font-style: italic; }
 
-        /* 输入框 */
+        /* 输入区 */
+        .input-group { margin-bottom: 25px; }
+        .input-group label { display: block; margin-bottom: 10px; font-size: 0.95rem; color: #555; text-align: center; }
         input[type="text"] {
             width: 100%;
-            padding: 14px;
+            padding: 12px;
             font-size: 1rem;
-            border: 1px solid #e0e0e0;
-            border-radius: 10px;
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            box-sizing: border-box;
+            background: #fdfdfd;
             text-align: center;
-            margin-bottom: 25px;
-            background: #fcfcfc;
             outline: none;
             transition: border-color 0.3s;
         }
-        input[type="text"]:focus { border-color: var(--action-red); box-shadow: 0 0 5px rgba(192, 57, 43, 0.2); }
+        input[type="text"]:focus { border-color: var(--accent-gold); box-shadow: 0 0 5px rgba(194, 153, 95, 0.3); }
 
         /* 按钮风格 */
         .btn {
             width: 100%;
-            padding: 16px;
+            padding: 14px;
             border: none;
-            border-radius: 50px;
-            font-size: 1.1rem;
+            border-radius: 8px;
+            font-size: 1.05rem;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            letter-spacing: 1px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        .btn-start { background: linear-gradient(45deg, var(--action-red), #8e1419); color: white; }
-        .btn-start:active { transform: scale(0.98); }
-        .btn-start:disabled { background: #ccc; color: #999; box-shadow: none; cursor: not-allowed; }
-        .btn-ai { background: var(--dark-primary); color: var(--accent-gold); margin-top: 15px; }
+        .btn-start { background: var(--highlight-red); color: white; }
+        .btn-start:active { transform: translateY(1px); box-shadow: 0 1px 5px rgba(0,0,0,0.1); }
+        .btn-start:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; }
+        .btn-ai { background: var(--primary-ink); color: var(--accent-gold); margin-top: 15px; }
+        .btn-restart { background: none; border: 1px solid var(--border-light); color: #888; margin-top: 25px; }
 
         /* 摇卦区 */
-        .stage { height: 70px; display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .stage-area {
+            min-height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 18px;
+            margin: 25px 0;
+            background: #fefefe;
+            border-radius: 10px;
+            border: 1px dashed var(--border-light);
+            padding: 15px;
+        }
         .coin {
-            width: 45px; height: 45px; border-radius: 50%;
+            width: 48px; height: 48px;
+            border-radius: 50%;
             border: 3px solid var(--accent-gold);
-            background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease-out;
-            animation: flip 0.5s ease-in-out;
+            background: #fdfdfd;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 1rem; color: var(--primary-ink);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            animation: coinSpin 0.5s ease-out;
         }
-        .coin.yin { background: var(--dark-primary); border-color: var(--dark-primary); }
-
-        @keyframes flip {
-            0% { transform: scale(0.5) rotateY(0deg); }
-            100% { transform: scale(1) rotateY(360deg); }
-        }
+        .coin.yin { background: var(--primary-ink); color: #fff; border-color: var(--primary-ink); }
+        @keyframes coinSpin { from { transform: scale(0.8) rotateY(0deg); opacity: 0.5; } to { transform: scale(1) rotateY(360deg); opacity: 1; } }
 
         /* 历史记录 */
-        .history { margin-top: 20px; display: flex; flex-direction: column-reverse; gap: 8px; }
-        .row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #eee; font-size: 0.95rem; }
-        .sym { font-family: monospace; font-weight: 900; font-size: 1.2rem; color: var(--dark-primary); }
-        .red-dot { color: var(--action-red); margin-left: 5px; font-size: 1.1em; }
-        
-        /* 结果卡片 UI */
-        #shareCard { 
-            display: none; 
-            margin-top: 30px; 
-            padding: 25px; 
-            border-radius: 15px; 
-            background: linear-gradient(160deg, var(--card-white) 0%, #fff8e1 100%); /* 优雅渐变 */
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            border: 2px solid var(--accent-gold);
+        .history-list { display: flex; flex-direction: column-reverse; gap: 6px; margin-top: 20px; }
+        .history-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px dotted var(--border-light);
+            font-size: 0.95rem;
         }
-        .card-header { text-align: center; margin-bottom: 20px; }
-        .card-header h2 { color: var(--action-red); font-size: 1.5rem; margin: 0; }
-        .card-meta { font-size: 0.85rem; color: #888; margin-top: 5px; }
-        .card-content { border-top: 1px dashed #ddd; padding-top: 20px; }
-        .share-prompt { background: #e8f5e9; color: #388e3c; padding: 12px; border-radius: 10px; font-weight: bold; margin-top: 25px; }
+        .yao-symbol { font-family: 'Courier New', monospace; font-weight: 900; font-size: 1.3rem; letter-spacing: -2px; color: var(--primary-ink); }
+        .dong-mark { color: var(--highlight-red); margin-left: 5px; font-size: 1.1em; }
 
-        /* AI 输出格式优化 */
-        .card-content p { margin-bottom: 1em; line-height: 1.8; }
-        .card-content strong { color: var(--dark-primary); }
-        .card-content h3 { color: var(--action-red); border-left: 3px solid var(--action-red); padding-left: 10px; margin-top: 1.5em; }
+        /* 结果与分享卡片 */
+        #resultView { display: none; margin-top: 30px; }
+        .result-card {
+            padding: 25px;
+            border-radius: 10px;
+            background: linear-gradient(145deg, var(--card-soft), #fffaf0);
+            border: 1px solid var(--accent-gold);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+        .card-title { text-align: center; color: var(--highlight-red); font-size: 1.4rem; margin-bottom: 15px; }
+        .meta-info { font-size: 0.9rem; color: #777; margin-bottom: 20px; line-height: 1.6; text-align: center; }
 
-        /* 排盘信息（隐藏在卡片内，简洁化） */
-        #baseInfo { background: #fcfcfc; border: 1px solid #eee; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9em; line-height: 1.6; }
-        
-        /* 重新起卦按钮 */
-        .restart-btn { 
-            color: var(--dark-primary); 
-            background: none; 
-            border: none; 
-            padding: 10px; 
+        /* AI 解读内容 */
+        .ai-content { 
+            border-top: 1px dashed var(--border-light); 
+            padding-top: 20px; 
             margin-top: 20px; 
-            font-size: 0.9rem;
-            opacity: 0.7;
+            line-height: 1.8; 
+            font-size: 0.98rem;
+            color: var(--primary-ink);
+        }
+        .ai-content p { margin-bottom: 1em; }
+        .ai-content strong { color: var(--primary-ink); }
+        .ai-content h3 { 
+            color: var(--highlight-red); 
+            font-size: 1.1rem; 
+            margin-top: 1.5em; 
+            margin-bottom: 0.8em; 
+            border-left: 3px solid var(--highlight-red); 
+            padding-left: 10px;
+        }
+        
+        .share-prompt { 
+            text-align: center; 
+            margin-top: 25px; 
+            padding: 10px; 
+            background: #e6f7e6;
+            color: #388e3c; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            font-size: 0.9em;
         }
     </style>
 </head>
@@ -148,48 +170,51 @@
 <div class="app-container">
     <header>
         <h1>玄机<span>六爻</span></h1>
-        <div class="subtitle">深度推算 · 微信分享专用</div>
+        <div class="subtitle">洞察天机 · 直通推演</div>
     </header>
-    
-    <script>
-        const WORKER_ENDPOINT = "https://t6.tk709054540.workers.dev"; // 部署后，请替换此地址！
-    </script>
-    
+
     <div id="setupView">
-        <input type="text" id="question" placeholder="在此输入您想问的问题（心诚则灵）">
-        
-        <div class="stage" id="coinStage"><span>心念合一，点击开始</span></div>
+        <div class="input-group">
+            <label for="question">🙏 请虔诚默念问题，然后输入：</label>
+            <input type="text" id="question" placeholder="例如：近期财运如何？事业发展如何？">
+        </div>
+
+        <div class="stage-area" id="coinStage">
+            <span style="color:#a0a0a0;">点击下方按钮，开始摇卦...</span>
+        </div>
+
         <button class="btn btn-start" id="tossBtn" onclick="userToss()">开始摇卦 (1/6)</button>
-        <div class="history" id="historyLog"></div>
+        
+        <div class="history-list" id="historyLog"></div>
     </div>
 
-    <div id="resultView" style="display: none;">
-        <div class="info-card" id="baseInfo"></div>
-        
-        <div id="shareCard">
-            <div class="card-header">
-                <h2>✨ 【神机解语】 ✨</h2>
-                <div class="card-meta" id="cardMeta"></div>
-            </div>
-            <div class="card-content" id="cardContent">
+    <div id="resultView">
+        <div class="result-card">
+            <div class="card-title">✨ 神机解语 ✨</div>
+            <div class="meta-info" id="cardMeta"></div>
+            
+            <div class="ai-content" id="aiOutput">
                 <div style="text-align:center; color:#999;">请点击下方按钮请求 AI 解读...</div>
                 <div style="text-align:center; margin-top:20px;">
                     <button class="btn btn-ai" id="aiBtn" onclick="callDeepSeek()">🤖 请求 AI 大师解卦</button>
                 </div>
             </div>
+            
             <div class="share-prompt">
-                长按卡片区域即可保存图片，分享至朋友圈或好友！
+                （Key已固化，无需重复输入）
             </div>
         </div>
         
         <div style="text-align:center;">
-            <button class="restart-btn" onclick="location.reload()">重新起卦</button>
+            <button class="btn btn-restart" onclick="location.reload()">重新起卦</button>
         </div>
     </div>
 </div>
 
 <script>
-    // --- 核心配置 (不变) ---
+    // --- 核心配置 ---
+    const DEEPSEEK_API_KEY = "sk-bf016720c8db4f70a9b0b72f05060e48"; // 固化您的 Key
+
     const CFG = {
         NA_JIA: { '乾': {z:['子','寅','辰','午','申','戌']}, '坤': {z:['未','巳','卯','丑','亥','酉']}, '震': {z:['子','寅','辰','午','申','戌']}, '巽': {z:['丑','亥','酉','未','巳','卯']}, '坎': {z:['寅','辰','午','申','戌','子']}, '离': {z:['卯','丑','亥','酉','未','巳']}, '艮': {z:['辰','午','申','戌','子','寅']}, '兑': {z:['巳','卯','丑','亥','酉','未']} },
         PALACE: {'乾':'金','兑':'金','离':'火','震':'木','巽':'木','坎':'水','艮':'土','坤':'土'},
@@ -199,15 +224,12 @@
 
     let state = { count: 0, results: [], data: {} };
     
-    // --- 修复后的摇卦函数：增加容错和稳定性 ---
+    // --- 摇卦函数 ---
     function userToss() {
         try {
             if(state.count >= 6) return;
-
-            // 震动反馈 (如果设备支持)
             if(navigator.vibrate) navigator.vibrate(50); 
 
-            // 模拟硬币
             let c = [Math.random()>.5?1:0, Math.random()>.5?1:0, Math.random()>.5?1:0];
             let sum = c[0]+c[1]+c[2];
             let val = sum===1?7 : sum===2?8 : sum===3?9 : 6;
@@ -216,13 +238,11 @@
             state.results.push(val);
             state.count++;
 
-            // 渲染硬币 (使用空div触发CSS动画)
             document.getElementById('coinStage').innerHTML = c.map(y => `<div class="coin ${y?'yin':''}"></div>`).join('');
             
-            // 渲染列表
             let sym = (val===7||val===9)?"━━━":"━　━";
-            let mk = (val===6||val===9)?"<span class='red-dot'>●</span>":"";
-            let row = `<div class="row"><span>${state.count}. ${name}</span><span class="sym">${sym} ${mk}</span></div>`;
+            let mk = (val===6||val===9)?"<span class='dong-mark'>●</span>":"";
+            let row = `<div class="history-item"><span>第 ${state.count} 爻 · ${name}</span><span class="yao-symbol">${sym} ${mk}</span></div>`;
             document.getElementById('historyLog').insertAdjacentHTML('afterbegin', row);
 
             let btn = document.getElementById('tossBtn');
@@ -235,37 +255,30 @@
             }
         } catch(e) {
             console.error("摇卦功能出错:", e);
-            alert("摇卦功能暂时出错，请检查控制台或刷新重试。");
+            alert("摇卦功能出现异常，请刷新页面或检查控制台。");
         }
     }
 
+    // --- 排盘函数 ---
     function calculate() {
         document.getElementById('setupView').style.display = 'none';
         document.getElementById('resultView').style.display = 'block';
 
         let dateStr = "", gzDay = "甲子", dayGan = "甲", xunKong = "未知";
         try { 
-            // 尝试获取准确时间
-            if(typeof Solar === 'undefined') throw new Error("Lib missing");
+            if(typeof Solar === 'undefined') throw new Error("Lunar.js library not loaded.");
             const d = Solar.fromDate(new Date()); const l = d.getLunar();
             dateStr = l.getYearInGanZhi() + "年" + l.getMonthInGanZhi() + "月";
-            gzDay = l.getDayInGanZhi(); dayGan = gzDay[0]; xunKong = l.getDayXunKong();
+            gzDay = l.getDayInGanZhi(); dayGan = l.getDayInGanZhi()[0]; xunKong = l.getDayXunKong();
         } catch(e) { 
+            console.warn("无法加载日历库或计算失败，使用通用时间:", e);
             dateStr = (new Date()).toLocaleDateString('zh-CN');
-            // 降级使用默认值
         }
 
         const benBits = state.results.map(r=>(r===7||r===9)?1:0);
         const benInfo = getGuaName(benBits);
         const meEl = CFG.PALACE[benInfo.palace];
 
-        document.getElementById('baseInfo').innerHTML = `
-            <strong>求问：</strong>${document.getElementById('question').value || "未指定问题"}<br>
-            <strong>日期：</strong>${dateStr} / ${gzDay} (${xunKong}空)<br>
-            <strong>卦名：</strong>${benInfo.name} (属${benInfo.palace}${meEl})
-        `;
-
-        // 提取动爻信息 (简化，主要交给AI处理)
         const moves = state.results.map((v, i) => (v===6 || v===9) ? `${['初','二','三','四','五','上'][i]}爻动` : null).filter(Boolean);
 
         state.data = {
@@ -275,68 +288,89 @@
             m: moves.join('；') || "静卦"
         };
         
-        // 显示卡片头部信息
-        document.getElementById('cardMeta').innerHTML = `所问：${state.data.q} &nbsp;|&nbsp; 卦象：${state.data.g}`;
+        document.getElementById('cardMeta').innerHTML = `
+            <strong>所问：</strong>${state.data.q}<br>
+            <strong>日期：</strong>${dateStr} / ${gzDay} (${xunKong}空)<br>
+            <strong>卦象：</strong>${state.data.g} (属${benInfo.palace}${meEl})
+        `;
     }
 
-    // --- 调用 DeepSeek Worker Proxy (关键函数) ---
+    // --- AI 解卦函数 (直接调用 DeepSeek API，使用硬编码 Key) ---
     async function callDeepSeek() {
-        if (WORKER_ENDPOINT.includes("YOUR-WORKER-NAME")) {
-             alert("功能错误：请先部署 Cloudflare Worker，并将 WORKER_ENDPOINT 替换为您自己的地址！");
-             return;
+        const apiKey = DEEPSEEK_API_KEY; // 使用固化的 Key
+        const btn = document.getElementById('aiBtn');
+        const out = document.getElementById('aiOutput');
+        
+        if (!apiKey) {
+            out.innerHTML = `<div style="color:var(--highlight-red); font-weight:bold;">❌ 错误：代码中未找到 API Key。</div>`;
+            return;
         }
 
-        const btn = document.getElementById('aiBtn');
-        const out = document.getElementById('cardContent');
-        
         btn.disabled = true;
         btn.innerText = "⏳ AI 正在推算，请稍候...";
-        out.innerHTML = `<div style='text-align:center; color:${getComputedStyle(document.documentElement).getPropertyValue('--accent-gold').trim()};'>神机推演中...</div>`;
+        out.innerHTML = `<div style='text-align:center; color:${getComputedStyle(document.documentElement).getPropertyValue('--accent-gold').trim()};'>神机推演中，请稍候...</div>`;
         
         const prompt = `你是专业的六爻大师。问题：${state.data.q}。时间：${state.data.d}。本卦：${state.data.g}。动爻：${state.data.m}。请严格按照以下步骤推算并格式化输出：\n\n### 1. 简要分析\n\n- 取用神\n- 析旺衰\n\n### 2. 吉凶断语\n\n- 直接给出结论（吉/凶/平）\n- 解释主卦与动爻对用神的影响。\n\n### 3. 行动建议\n\n- 提供通俗易懂、具有哲理性的行动指导和建议。`;
 
         try {
-            const res = await fetch(WORKER_ENDPOINT, {
+            const res = await fetch('https://api.deepseek.com/chat/completions', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: prompt })
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: "deepseek-chat",
+                    messages: [{role: "user", content: prompt}],
+                    temperature: 1.0,
+                    stream: false
+                })
             });
             
             const data = await res.json();
             
             if(res.status !== 200) {
-                 throw new Error(data.message || 'Worker返回错误，请检查Key是否有效。');
+                 throw new Error(data.error?.message || `API请求失败，状态码: ${res.status}`);
             }
             
-            // 渲染结果
             out.innerHTML = typeof marked !== 'undefined' ? marked.parse(data.choices[0].message.content) : data.choices[0].message.content;
-            btn.style.display = 'none'; // 解读成功后隐藏按钮
+            btn.style.display = 'none';
 
         } catch(e) {
-            out.innerHTML = `<div style="color:var(--action-red); font-weight:bold;">❌ 推算失败：请检查 Worker 地址或 Key 是否正确。错误信息：${e.message}</div>`;
+            out.innerHTML = `<div style="color:var(--highlight-red); font-weight:bold;">❌ 推算失败：${e.message}<br>请检查 Key 是否有效或网络是否畅通。</div>`;
             btn.innerText = "❌ 重新请求"; btn.disabled = false;
+            console.error("AI解卦错误:", e);
         }
     }
 
-    // --- 辅助函数 (简化版，确保不报错) ---
+    // --- 辅助函数 (保持不变) ---
     function getGuaName(bits) {
         const n = ['坤','震','坎','兑','艮','离','巽','乾'];
-        const u = parseInt(bits.slice(3,6).reverse().join(''), 2);
-        const l = parseInt(bits.slice(0,3).reverse().join(''), 2);
         const guaNames = ['天', '地', '水', '火', '雷', '风', '山', '泽'];
-        // 简化命名逻辑
-        return { name: guaNames[u] + guaNames[l] + "卦", palace: n[u] }; 
+        const up = parseInt(bits.slice(3,6).reverse().join(''), 2);
+        const low = parseInt(bits.slice(0,3).reverse().join(''), 2);
+        return { name: guaNames[up] + guaNames[low] + "卦", palace: n[up] }; 
     }
     function getZhis(bits) {
         const n = ['坤','震','坎','兑','艮','离','巽','乾'];
-        const u = parseInt(bits.slice(3,6).reverse().join(''), 2);
-        const l = parseInt(bits.slice(0,3).reverse().join(''), 2);
-        return [...CFG.NA_JIA[n[l]].z.slice(0,3), ...CFG.NA_JIA[n[u]].z.slice(3,6)];
+        const up = parseInt(bits.slice(3,6).reverse().join(''), 2);
+        const low = parseInt(bits.slice(0,3).reverse().join(''), 2);
+        return [...CFG.NA_JIA[n[low]].z.slice(0,3), ...CFG.NA_JIA[n[up]].z.slice(3,6)];
     }
-    function getRel(me, other) { /* ... */ return "六亲"; }
-    function getBeasts(g) { /* ... */ return []; }
+    function getRel(me, other) {
+        if(me===other) return "兄弟";
+        const s = {金:'水',水:'木',木:'火',火:'土',土:'金'};
+        const k = {金:'木',木:'土',土:'水',水:'火',火:'金'};
+        if(s[me]===other) return "子孙"; if(s[other]===me) return "父母";
+        if(k[me]===other) return "妻财"; if(k[other]===me) return "官鬼";
+        return "未知";
+    }
+    function getBeasts(g) {
+        const m = {甲:0,乙:0,丙:1,丁:1,戊:2,己:3,庚:4,辛:4,壬:5,癸:5};
+        const b = ['青龙','朱雀','勾陈','滕蛇','白虎','玄武'];
+        return Array.from({length:6},(_,i)=>b[(m[g]||0+i)%6]);
+    }
 
-    // 页面加载时启用按钮
     window.onload = function() {
         document.getElementById('tossBtn').disabled = false;
     };
